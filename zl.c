@@ -21,7 +21,7 @@
 #define C_OTHER   "\033[38;5;208m"
 
 static int show_hidden = 0;
-static int raw_bytes = 0;   /* -b: show exact byte count instead of human-readable */
+static int raw_bytes = 0;   
 
 static const char *image_ext[] = {
     "jpg","jpeg","png","gif","bmp","svg","webp","tiff","tif","ico","heic","raw", NULL
@@ -63,9 +63,7 @@ static int cmp_entries(const void *a, const void *b) {
     return strcasecmp(ea->name, eb->name);
 }
 
-/* Formats a size into buf as plain text (no padding, no color).
- * raw_bytes (-b) -> exact byte count ("5242880b")
- * otherwise       -> human readable, lowercase units ("10gb", "2kb", "500b") */
+
 static void format_size(off_t size, char *buf, size_t bufsz) {
     if (raw_bytes) {
         snprintf(buf, bufsz, "%lldb", (long long)size);
@@ -92,19 +90,18 @@ static int term_width(void) {
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0) {
         return ws.ws_col;
     }
-    return 80; /* fallback for non-tty / no ioctl support */
+    return 80; 
 }
 
 static int compute_cols(size_t cell_width) {
     int tw = term_width();
-    int cols = tw / (int)(cell_width + 2); /* 2 spaces gutter between columns */
+    int cols = tw / (int)(cell_width + 2); 
     if (cols < 1) cols = 1;
-    if (!isatty(STDOUT_FILENO)) cols = 1; /* one per line when piped, like ls */
+    if (!isatty(STDOUT_FILENO)) cols = 1; 
     return cols;
 }
 
-/* The true default view: "year/month/day              file1.txt --10gb"
- * cells, stacked in ls-style "down then across" grid columns. */
+
 static void print_grid_sized(entry_t *entries, size_t count) {
     if (count == 0) return;
 
@@ -129,9 +126,9 @@ static void print_grid_sized(entry_t *entries, size_t count) {
         if (nlen > max_name) max_name = nlen;
     }
 
-    /* 10 chars for "year/month/day", 14 spaces for alignment separation gap */
+    
     size_t time_and_gap_width = 10 + 14;
-    size_t cell_width = time_and_gap_width + max_name + 2 /* "--" */ + 8 /* rough size fallback */;
+    size_t cell_width = time_and_gap_width + max_name + 2  + 8 ;
 
     int cols = compute_cols(cell_width);
     size_t rows = (count + (size_t)cols - 1) / (size_t)cols;
@@ -144,16 +141,16 @@ static void print_grid_sized(entry_t *entries, size_t count) {
             const char *col = color_for(entries[idx].name, &entries[idx].st);
             size_t name_pad = max_name - strlen(entries[idx].name);
 
-            /* print: year/month/day              [colored_name] */
+            
             printf("%s              %s%s%s", timebuf[idx], col, entries[idx].name, C_RESET);
             for (size_t p = 0; p < name_pad; p++) putchar(' ');
 
-            /* print: --size */
+           
             printf("--%s", sizebuf[idx]);
 
             int is_last_col_in_row = (c == cols - 1) || (idx + rows >= count);
             if (!is_last_col_in_row) {
-                /* standard 2 spaces separator padding between columns grid cells */
+                
                 printf("  ");
             }
         }
@@ -216,7 +213,7 @@ static void list_dir(const char *path) {
 
     qsort(entries, count, sizeof(entry_t), cmp_entries);
 
-    // Forces the minimalist timestamp and size layout to run natively everywhere
+   
     print_grid_sized(entries, count);
 
     for (size_t i = 0; i < count; i++) free(entries[i].name);
@@ -231,7 +228,7 @@ int main(int argc, char **argv) {
         if (argv[i][0] == '-' && argv[i][1] != '\0') {
             for (int j = 1; argv[i][j]; j++) {
                 if (argv[i][j] == 'a') show_hidden = 1;
-                else if (argv[i][j] == 'b') raw_bytes = 1; /* force exact byte counts */
+                else if (argv[i][j] == 'b') raw_bytes = 1; 
                 else {
                     fprintf(stderr, "zl: invalid option -- '%c'\n", argv[i][j]);
                     return 1;
