@@ -7,7 +7,9 @@ zl is a fast, lightweight, and modern `ls` replacement built in pure C. It was m
 - **Built-in Grid Layout:** Automatically stacks files into smart, columned grids that calculate width using `ioctl` and terminal dimensions.
 - **Minimalist Data View:** Drops legacy visual noise (like permissions, ownership blocks, and link counts) to keep your terminal perfectly clean.
 - **Custom Spacing:** Formatted to natively display information in a streamlined layout:
+  
   `year/month/day              filename --size`
+
 - **FOSS & Lightweight:** Zero bloated dependencies, extremely fast compilation, and small memory footprint.
 - **Colorized Output:** Native terminal coloring to distinguish directories, images, audio, video, and source files at a glance.
 
